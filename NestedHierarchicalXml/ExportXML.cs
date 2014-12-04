@@ -6,13 +6,18 @@ namespace NestedHierarchicalXml
     static class GroupedExport
     {
 
+        public static void ExportXML()
+        {
+            string FileName = @"d:\test.xml";
+            ExportXML(FileName);
+        }
+
 
         // NestedHierarchicalXml.GroupedExport.ExportXML();
-        public static void ExportXML()
+        public static void ExportXML(string FileName)
         {
             bool asAttributes = false;
             bool bRemoveUnwantedElementsOrValues = true;
-            
 
             string strSQL = @"
       SELECT 9999 AS i, NULL AS InternalName, 'RoomExport' AS DisplayName 
@@ -139,8 +144,8 @@ SELECT * FROM T_Art WHERE AR_RM_UID IS NOT NULL;
                 } // End if (asAttributes)
 
 
-                
-                System.Xml.XmlDocument doc = bRemoveUnwantedElementsOrValues ? RemoveUnwantedElementsOrValues(ds) : null;
+
+                System.Xml.XmlDocument doc = RemoveUnwantedElementsOrValues(ds, bRemoveUnwantedElementsOrValues);
 
                 System.Xml.XmlWriterSettings settings = new System.Xml.XmlWriterSettings();
                 settings.Indent = true;
@@ -151,10 +156,11 @@ SELECT * FROM T_Art WHERE AR_RM_UID IS NOT NULL;
                 settings.NewLineChars = System.Environment.NewLine;
                 settings.OmitXmlDeclaration = false;
 
+
                 // Write as UTF-8 with indentation
-                using (System.Xml.XmlWriter w = System.Xml.XmlWriter.Create(@"d:\test.xml", settings)) 
+                using (System.Xml.XmlWriter w = System.Xml.XmlWriter.Create(FileName, settings)) 
                 {
-                    if (bRemoveUnwantedElementsOrValues)
+                    if (doc != null)
                         doc.Save(w);
                     else
                         ds.WriteXml(w);
@@ -165,9 +171,14 @@ SELECT * FROM T_Art WHERE AR_RM_UID IS NOT NULL;
         } // End Sub ExportXML
 
 
-        public static System.Xml.XmlDocument RemoveUnwantedElementsOrValues(System.Data.DataSet ds)
+        public static System.Xml.XmlDocument RemoveUnwantedElementsOrValues(System.Data.DataSet ds, bool bRemoveUnwantedElementsOrValues)
         {
+            if (bRemoveUnwantedElementsOrValues)
+                return null;
+
+
             System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+            
             string strXML = ds.GetXml();
             doc.LoadXml(strXML);
 
@@ -176,8 +187,8 @@ SELECT * FROM T_Art WHERE AR_RM_UID IS NOT NULL;
             names.AddNamespace("dft", "");
 
             string[] selectors = new string[] { 
-                    "//Workplaces/WP_RM_UID",
-                    "//WorksOfArt/AR_RM_UID"
+                     "//Workplaces/WP_RM_UID" 
+                    ,"//WorksOfArt/AR_RM_UID" 
             };
 
 
@@ -199,8 +210,8 @@ SELECT * FROM T_Art WHERE AR_RM_UID IS NOT NULL;
 
 
             selectors = new string[] { 
-                    "//Workplaces[@WP_RM_UID]",
-                    "//WorksOfArt[@AR_RM_UID]"
+                     "//Workplaces[@WP_RM_UID]"
+                    ,"//WorksOfArt[@AR_RM_UID]"
             };
 
 
