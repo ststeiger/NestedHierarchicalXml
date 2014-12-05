@@ -23,8 +23,6 @@ namespace NestedHierarchicalXml
                 Application.Run(new Form1());
             } // End if (!is_console_app)
 
-            string str = System.Web.HttpUtility.UrlEncode("https://www6.cor-asp.ch/fm_cor_demo/w8/index.html");
-            System.Console.WriteLine(str);
 
 
             GroupedExport.ExportXML();

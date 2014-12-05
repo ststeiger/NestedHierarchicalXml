@@ -29,6 +29,29 @@ UNION SELECT 5 AS i, 'T_Art' AS InternalName, 'ArtWork' AS DisplayName
 ;
 
 
+
+
+      SELECT 'relRoomWorkplaces' AS RelName, 
+		     'T_Room' AS ParentTable, 'RM_UID' AS ParentCol, 
+		     'Workplaces' AS ChildTable, 'WP_RM_UID' AS ChildColumn, 
+		      CAST('true' AS bit) AS Enforce 
+UNION SELECT 'relWorkplaces' AS RelName, 
+			 'Workplaces' AS ParentTable, 'WP_RM_UID' AS ParentCol, 
+			 'T_Workplace' AS ChildTable, 'WP_RM_UID' AS ChildColumn, 
+			  CAST('true' AS bit) AS Enforce 
+UNION SELECT 'relRoomWorksOfArt' AS RelName, 
+			 'T_Room' AS ParentTable, 'RM_UID' AS ParentCol, 
+			 'WorksOfArt' AS ChildTable, 'AR_RM_UID' AS ChildColumn, 
+			  CAST('true' AS bit) AS Enforce 
+UNION SELECT 'WorksOfArt' AS RelName, 
+			 'WorksOfArt' AS ParentTable, 'AR_RM_UID' AS ParentCol, 
+			 'T_Art' AS ChildTable, 'AR_RM_UID' AS ChildColumn, 
+			  CAST('true' AS bit) AS Enforce 
+; 
+
+
+
+
 SELECT null as bla, * FROM T_Room; 
 SELECT DISTINCT WP_RM_UID FROM T_Workplace AS Workplaces; 
 SELECT * FROM T_Workplace WHERE WP_RM_UID IS NOT NULL; 
@@ -36,24 +59,18 @@ SELECT DISTINCT AR_RM_UID FROM T_Art AS WorksOfArt;
 SELECT * FROM T_Art WHERE AR_RM_UID IS NOT NULL; 
 ";
 
-            using (System.Data.DataSet ds = new System.Data.DataSet())
+            using (System.Data.DataSet ds = SQL.GetDataSet(strSQL))
             {
-
-                using (System.Data.Common.DbDataAdapter da = GetDataAdapter(strSQL))
-                {
-                    da.Fill(ds);
-                } // End Using da
-
 
                 foreach (System.Data.DataRow dr in ds.Tables[0].Rows)
                 {
                     int i = System.Convert.ToInt32(dr["i"]);
                     string internalName = System.Convert.ToString(dr["InternalName"]);
 
-                    if (i == 9999)
+                    if (i > 9900)
                         continue;
 
-                    ds.Tables[i].TableName = internalName;
+                    ds.Tables[i + 1].TableName = internalName;
                 } // Next dr 
 
                 
@@ -63,51 +80,74 @@ SELECT * FROM T_Art WHERE AR_RM_UID IS NOT NULL;
 
                 // ---------------------- Workplaces
 
-                System.Data.DataRelation relRoomWorkplaces = new System.Data.DataRelation(
-                    "relRoomWorkplaces" // relation name
-                    , ds.Tables["T_Room"].Columns["RM_UID"] // parent column
-                    , ds.Tables["Workplaces"].Columns["WP_RM_UID"] // child column
-                );
+                //System.Data.DataRelation relRoomWorkplaces = new System.Data.DataRelation(
+                //    "relRoomWorkplaces" // relation name
+                //    , ds.Tables["T_Room"].Columns["RM_UID"] // parent column
+                //    , ds.Tables["Workplaces"].Columns["WP_RM_UID"] // child column
+                //);
+                //// relRoomWorkplaces.Nested = true;
 
-                relRoomWorkplaces.Nested = true;
 
+                // add("RelationName", Parent_Column, Child_Column, createConstraints)
+                
 
-                // This relation will yield an "Orders" node in each Customer node
-                System.Data.DataRelation relWorkplaces = new System.Data.DataRelation(
-                    "relWorkplaces" // relation name
-                    , ds.Tables["Workplaces"].Columns["WP_RM_UID"] // parent column
-                    , ds.Tables["T_Workplace"].Columns["WP_RM_UID"] // child column
-                );
-                relWorkplaces.Nested = true;
-
+                //System.Data.DataRelation relWorkplaces = new System.Data.DataRelation(
+                //    "relWorkplaces" // relation name
+                //    , ds.Tables["Workplaces"].Columns["WP_RM_UID"] // parent column
+                //    , ds.Tables["T_Workplace"].Columns["WP_RM_UID"] // child column
+                //);
+                // relWorkplaces.Nested = true;
+                
 
                 // ---------------------- Art 
 
-                System.Data.DataRelation relRoomWorksOfArt = new System.Data.DataRelation(
-    "relRoomWorksOfArt" // relation name
-    , ds.Tables["T_Room"].Columns["RM_UID"] // parent column
-    , ds.Tables["WorksOfArt"].Columns["AR_RM_UID"] // child column
-);
+                //System.Data.DataRelation relRoomWorksOfArt = new System.Data.DataRelation(
+                //    "relRoomWorksOfArt" // relation name
+                //    , ds.Tables["T_Room"].Columns["RM_UID"] // parent column
+                //    , ds.Tables["WorksOfArt"].Columns["AR_RM_UID"] // child column
+                //);
 
-                relRoomWorksOfArt.Nested = true;
 
+                // relRoomWorksOfArt.Nested = true;
+                
 
                 // This relation will yield an "Orders" node in each Customer node
-                System.Data.DataRelation relArt = new System.Data.DataRelation(
-                    "relArt" // relation name
-                    , ds.Tables["WorksOfArt"].Columns["AR_RM_UID"] // parent column
-                    , ds.Tables["T_Art"].Columns["AR_RM_UID"] // child column
-                );
-                relArt.Nested = true;
+                //System.Data.DataRelation relArt = new System.Data.DataRelation(
+                //    "relArt" // relation name
+                //    , ds.Tables["WorksOfArt"].Columns["AR_RM_UID"] // parent column
+                //    , ds.Tables["T_Art"].Columns["AR_RM_UID"] // child column
+                //);
+                // relArt.Nested = true;
+                //ds.Relations.Add("relArt"
+                //    , ds.Tables["WorksOfArt"].Columns["AR_RM_UID"]
+                //    , ds.Tables["T_Art"].Columns["AR_RM_UID"]
+                //    , true
+                //);
 
 
 
+                //ds.Relations.Add(relRoomWorkplaces);
+                //ds.Relations.Add(relWorkplaces);
+                //ds.Relations.Add(relRoomWorksOfArt);
+                //ds.Relations.Add(relArt);
 
-                // relRoomWorkplaces.Nested = true;
-                ds.Relations.Add(relRoomWorkplaces);
-                ds.Relations.Add(relWorkplaces);
-                ds.Relations.Add(relRoomWorksOfArt);
-                ds.Relations.Add(relArt);
+
+
+                foreach (System.Data.DataRow dr in ds.Tables[1].Rows)
+                {
+                    string RelName = System.Convert.ToString(dr["RelName"]);
+                    string ParentTable = System.Convert.ToString(dr["ParentTable"]);
+                    string ParentCol = System.Convert.ToString(dr["ParentCol"]);
+                    string ChildTable = System.Convert.ToString(dr["ChildTable"]);
+                    string ChildColumn = System.Convert.ToString(dr["ChildColumn"]);
+                    bool Enforce = System.Convert.ToBoolean(dr["Enforce"]);
+
+                    System.Data.DataRelation rel = new System.Data.DataRelation(RelName, ds.Tables[ParentTable].Columns[ParentCol], ds.Tables[ChildTable].Columns[ChildColumn], Enforce);
+                    rel.Nested = true;
+                    ds.Relations.Add(rel);
+                    // rel.ParentColumns[0].Unique = true;
+                    // rel.ChildColumns[0].Unique = false;
+                } // Next dr 
 
 
 
@@ -117,15 +157,17 @@ SELECT * FROM T_Art WHERE AR_RM_UID IS NOT NULL;
                     int i = System.Convert.ToInt32(dr["i"]);
                     string displayName = System.Convert.ToString(dr["DisplayName"]);
 
-                    if(i==9999)
+                    if(i > 9900)
                         ds.DataSetName = displayName;
                     else
-                        ds.Tables[i].TableName = displayName;
+                        ds.Tables[i + 1].TableName = displayName;
                 } // Next dr 
 
-                
+
 
                 ds.Tables.Remove(ds.Tables[0]);
+                ds.Tables.Remove(ds.Tables[0]);
+
 
                 if (asAttributes)
                 {
@@ -173,7 +215,7 @@ SELECT * FROM T_Art WHERE AR_RM_UID IS NOT NULL;
 
         public static System.Xml.XmlDocument RemoveUnwantedElementsOrValues(System.Data.DataSet ds, bool bRemoveUnwantedElementsOrValues)
         {
-            if (bRemoveUnwantedElementsOrValues)
+            if (!bRemoveUnwantedElementsOrValues)
                 return null;
 
 
@@ -268,21 +310,6 @@ SELECT * FROM T_Art WHERE AR_RM_UID IS NOT NULL;
             doc.Save(savePath);
         } // End Sub ChangeStandalone 
 
-
-        public static System.Data.Common.DbDataAdapter GetDataAdapter(string strSQL)
-        {
-            System.Data.SqlClient.SqlConnectionStringBuilder csb = new System.Data.SqlClient.SqlConnectionStringBuilder();
-            csb.DataSource = System.Environment.MachineName;
-            csb.InitialCatalog = "SwissRe_Test_V3";
-            csb.IntegratedSecurity = true;
-            if (!csb.IntegratedSecurity)
-            {
-                csb.UserID = "ApertureWebServices";
-                csb.Password = "";
-            } // End if (!csb.IntegratedSecurity)
-
-            return new System.Data.SqlClient.SqlDataAdapter(strSQL, csb.ConnectionString);
-        } // End Function GetDataAdapter
 
 
     } // End Class GroupedExport
